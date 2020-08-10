@@ -1,6 +1,10 @@
 #ifndef COMPONENTS_I2SBUF_INCLUDE_I2SBUF_H_
 #define COMPONENTS_I2SBUF_INCLUDE_I2SBUF_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "freertos/FreeRTOS.h"
 #include "driver/i2s.h"
 
@@ -18,5 +22,9 @@ esp_err_t i2sbuf_install(
 
 // user defined
 void i2sbuf_generate_samples(int16_t buf[], int n_samples);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* COMPONENTS_I2SBUF_INCLUDE_I2SBUF_H_ */
