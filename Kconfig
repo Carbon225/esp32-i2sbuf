@@ -1,0 +1,5 @@
+menu "I2SBUF"
+	config I2SBUF_DMA_BUF_LEN
+		int "Single buffer size"
+		default 256
+endmenu

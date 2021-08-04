@@ -1,0 +1,6 @@
+#ifndef _COMPONENTS_I2SBUF_PRIVINCLUDE_I2SBUF_TASK_H
+#define _COMPONENTS_I2SBUF_PRIVINCLUDE_I2SBUF_TASK_H_
+
+void i2sbuf_task(void *args);
+
+#endif
