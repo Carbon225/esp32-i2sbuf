@@ -2,6 +2,8 @@
 #include "i2sbuf_internal.h"
 #include "i2sbuf_task.h"
 
+#include "stdlib.h"
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "sdkconfig.h"
@@ -22,14 +24,14 @@ esp_err_t i2sbuf_install(const i2sbuf_config_t *config)
 			.dma_buf_count = config->buf_count,
 			.dma_buf_len = CONFIG_I2SBUF_DMA_BUF_LEN,
 			.use_apll = false,
-			.intr_alloc_flags = ESP_INTR_FLAG_LEVEL3
+			.intr_alloc_flags = ESP_INTR_FLAG_LEVEL3,
 	};
 
 	i2s_pin_config_t pin_config = {
 			.bck_io_num = config->clk_io,
 			.ws_io_num = config->ws_io,
 			.data_out_num = config->do_io,
-			.data_in_num = I2S_PIN_NO_CHANGE
+			.data_in_num = I2S_PIN_NO_CHANGE,
 	};
 
 	ERROR_CHECK_RETURN(i2s_driver_install(config->i2s_port, &i2s_config, 0, NULL));
@@ -37,10 +39,18 @@ esp_err_t i2sbuf_install(const i2sbuf_config_t *config)
 
 	ESP_LOGD(TAG, "I2S configured");
 
-	i2sbuf_config_t *config_ptr = malloc(sizeof(i2sbuf_config_t));
-	*config_ptr = *config;
+	i2sbuf_task_params_t *task_params = malloc(sizeof(*task_params));
+	task_params->i2s_port = config->i2s_port;
+	task_params->callback = config->callback;
+	task_params->user_data = config->user_data;
 
-	xTaskCreate(i2sbuf_task, "i2sbuf_task", 4096, config_ptr, 10, NULL);
+	// TODO check if task created
+	xTaskCreate(i2sbuf_task,
+			    "i2sbuf_task",
+				CONFIG_I2SBUF_TASK_STACK_SIZE,
+				task_params,
+				CONFIG_I2SBUF_TASK_PRIORITY,
+				NULL);
 
 	ESP_LOGD(TAG, "Tasks spawned");
 
