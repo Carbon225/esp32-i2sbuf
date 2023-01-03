@@ -5,6 +5,7 @@
 #include "driver/i2s.h"
 
 #include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 typedef struct i2sbuf_task_params
 {
