@@ -22,14 +22,13 @@ typedef struct wave_state
 
 void audio_callback(void *buf, int n_samples, void *user_data)
 {
-    int16_t (*samples)[2] = (int16_t (*)[2]) buf;
+    int16_t *samples = (int16_t*) buf;
     wave_state_t *state = (wave_state_t*) user_data;
     for (int i = 0; i < n_samples; ++i)
     {
         float sample = sinf(state->phase * (float) M_PI);
 
-        samples[i][0] = (int16_t) (sample * (float) INT16_MAX);
-        samples[i][1] = (int16_t) (sample * (float) INT16_MAX);
+        samples[i] = (int16_t) (sample * (float) INT16_MAX);
 
         state->phase += state->freq * 2.f / (float) SAMPLE_RATE;
 
@@ -50,7 +49,7 @@ void app_main(void)
             .do_io = I2S_DO,
             .clk_io = I2S_CK,
             .sample_rate = SAMPLE_RATE,
-            .stereo = true,
+            .stereo = false,
             .buf_len = BUF_LEN,
             .callback = audio_callback,
             .user_data = wave_state,
