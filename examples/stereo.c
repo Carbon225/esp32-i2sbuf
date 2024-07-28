@@ -19,25 +19,25 @@ static const char *TAG = "main";
 
 typedef struct wave_state
 {
-	float freq;
-	float phase;
+    float freq;
+    float phase;
 } wave_state_t;
 
 void audio_callback(int16_t buf[][2], int n_samples, void *user_data)
 {
-	wave_state_t *state = (wave_state_t*) user_data;
-	for (int i = 0; i < n_samples; ++i)
-	{
-		float sample = sinf(state->phase * (float) M_PI);
+    wave_state_t *state = (wave_state_t*) user_data;
+    for (int i = 0; i < n_samples; ++i)
+    {
+        float sample = sinf(state->phase * (float) M_PI);
 
-		buf[i][0] = (int16_t) (sample * (float) INT16_MAX);
-		buf[i][1] = (int16_t) (state->phase * (float) INT16_MAX);
+        buf[i][0] = (int16_t) (sample * (float) INT16_MAX);
+        buf[i][1] = (int16_t) (state->phase * (float) INT16_MAX);
 
-		state->phase += state->freq * 2.f / (float) SAMPLE_RATE;
+        state->phase += state->freq * 2.f / (float) SAMPLE_RATE;
 
-		if (state->phase > 1.f)
-			state->phase -= 2.f;
-	}
+        if (state->phase > 1.f)
+            state->phase -= 2.f;
+    }
 }
 
 void app_main(void)
@@ -49,16 +49,16 @@ void app_main(void)
     wave_state->freq = 220.f;
 
     i2sbuf_config_t config = {
-    		.i2s_port = I2S_NUM,
-			.ws_io = I2S_WS,
-			.do_io = I2S_DO,
-			.clk_io = I2S_CK,
-			.sample_rate = SAMPLE_RATE,
-			.use_apll = false,
-			.buf_len = BUF_LEN,
-			.buf_count = BUF_COUNT,
-			.callback = audio_callback,
-			.user_data = wave_state,
+            .i2s_port = I2S_NUM,
+            .ws_io = I2S_WS,
+            .do_io = I2S_DO,
+            .clk_io = I2S_CK,
+            .sample_rate = SAMPLE_RATE,
+            .use_apll = false,
+            .buf_len = BUF_LEN,
+            .buf_count = BUF_COUNT,
+            .callback = audio_callback,
+            .user_data = wave_state,
     };
 
     ESP_ERROR_CHECK(i2sbuf_install(&config));

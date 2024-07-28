@@ -12,19 +12,19 @@ typedef void (*i2sbuf_callback_t)(int16_t buf[][2], int n_samples, void *user_da
 
 typedef struct i2sbuf_config
 {
-	i2s_port_t i2s_port;
-	gpio_num_t ws_io;
-	gpio_num_t do_io;
-	gpio_num_t clk_io;
+    i2s_port_t i2s_port;
+    gpio_num_t ws_io;
+    gpio_num_t do_io;
+    gpio_num_t clk_io;
 
-	int sample_rate;
-	bool use_apll;
+    int sample_rate;
+    bool use_apll;
 
-	int buf_len;
-	int buf_count;
+    int buf_len;
+    int buf_count;
 
-	i2sbuf_callback_t callback;
-	void *user_data;
+    i2sbuf_callback_t callback;
+    void *user_data;
 } i2sbuf_config_t;
 
 esp_err_t i2sbuf_install(const i2sbuf_config_t *config);

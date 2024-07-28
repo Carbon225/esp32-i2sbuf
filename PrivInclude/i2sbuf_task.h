@@ -9,11 +9,11 @@
 
 typedef struct i2sbuf_task_params
 {
-	i2s_port_t i2s_port;
-	i2sbuf_callback_t callback;
-	void *user_data;
-	int buf_len;
-	TaskHandle_t parent_task;
+    i2s_port_t i2s_port;
+    i2sbuf_callback_t callback;
+    void *user_data;
+    int buf_len;
+    TaskHandle_t parent_task;
 } i2sbuf_task_params_t;
 
 void i2sbuf_task(void *args);
