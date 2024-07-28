@@ -4,28 +4,36 @@
 #include <stdlib.h>
 
 #include "freertos/FreeRTOS.h"
-
 #include "esp_log.h"
+#include "esp_err.h"
+
 static const char *TAG = "i2sbuf_task";
 
 void i2sbuf_task(void *args)
 {
     i2sbuf_task_params_t config = *(i2sbuf_task_params_t*)args;
 
-    // tell parent we have copied the params
     xTaskNotifyGive(config.parent_task);
 
     ESP_LOGD(TAG, "Allocating buffer");
-    int16_t (*const buf)[2] = malloc(sizeof(*buf) * config.buf_len);
+    size_t buf_len_samples = config.buf_len;
+    size_t buf_len_bytes = sizeof(int16_t[2]) * buf_len_samples;
+    uint8_t *const buf = malloc(buf_len_bytes);
 
-    size_t written;
+    ESP_ERROR_CHECK(i2s_channel_enable(config.tx_chan));
 
     ESP_LOGD(TAG, "Started");
 
     for (;;)
     {
-        config.callback(buf, config.buf_len, config.user_data);
-        i2s_write(config.i2s_port, buf, sizeof(*buf) * config.buf_len, &written, portMAX_DELAY);
+        config.callback(buf, buf_len_samples, config.user_data);
+        size_t bytes_sent = 0;
+        while (bytes_sent < buf_len_bytes)
+        {
+            size_t bytes_written;
+            ESP_ERROR_CHECK(i2s_channel_write(config.tx_chan, buf + bytes_sent, buf_len_bytes - bytes_sent, &bytes_written, 1000));
+            bytes_sent += bytes_written;
+        }
     }
 
     ESP_LOGD(TAG, "Terminating");
