@@ -26,7 +26,7 @@ void i2sbuf_task(void *args)
 
     for (;;)
     {
-        config.callback(buf, buf_len_samples, config.user_data);
+        config.callback((int16_t(*)[2])buf, buf_len_samples, config.user_data);
         size_t bytes_sent = 0;
         while (bytes_sent < buf_len_bytes)
         {
