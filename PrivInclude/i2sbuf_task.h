@@ -2,7 +2,7 @@
 #define _COMPONENTS_I2SBUF_PRIVINCLUDE_I2SBUF_TASK_H_
 
 #include "i2sbuf.h"
-#include "driver/i2s_std.h"
+#include "driver/i2s_types.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -13,6 +13,7 @@ typedef struct i2sbuf_task_params
     i2sbuf_callback_t callback;
     void *user_data;
     int buf_len;
+    bool pdm_mode;
     TaskHandle_t parent_task;
 } i2sbuf_task_params_t;
 

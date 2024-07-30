@@ -6,7 +6,8 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
-#include "driver/i2s_std.h"
+#include <stdint.h>
+#include "soc/gpio_num.h"
 
 typedef void (*i2sbuf_callback_t)(int16_t buf[][2], int n_samples, void *user_data);
 
@@ -17,8 +18,8 @@ typedef struct i2sbuf_config
     gpio_num_t clk_io;
 
     int sample_rate;
-
     int buf_len;
+    bool pdm_mode;
 
     i2sbuf_callback_t callback;
     void *user_data;

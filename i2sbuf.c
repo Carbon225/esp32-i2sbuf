@@ -5,18 +5,18 @@
 
 #include "freertos/FreeRTOS.h"
 #include "sdkconfig.h"
-
 #include "esp_log.h"
 #include "esp_err.h"
+#include "driver/i2s_std.h"
+#include "driver/i2s_pdm.h"
 
 static const char *TAG = "i2sbuf";
 
-void i2sbuf_install(const i2sbuf_config_t *config)
+static i2s_chan_handle_t configure_std(const i2sbuf_config_t *config)
 {
-    ESP_LOGD(TAG, "Initializing");
-
     i2s_chan_handle_t tx_chan;
     i2s_chan_config_t tx_chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_AUTO, I2S_ROLE_MASTER);
+    tx_chan_cfg.auto_clear = true;
     ESP_ERROR_CHECK(i2s_new_channel(&tx_chan_cfg, &tx_chan, NULL));
 
     i2s_std_config_t tx_std_cfg = {
@@ -36,6 +36,43 @@ void i2sbuf_install(const i2sbuf_config_t *config)
         },
     };
     ESP_ERROR_CHECK(i2s_channel_init_std_mode(tx_chan, &tx_std_cfg));
+    return tx_chan;
+}
+
+static i2s_chan_handle_t configure_pdm(const i2sbuf_config_t *config)
+{
+    i2s_chan_handle_t tx_chan;
+    i2s_chan_config_t tx_chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_AUTO, I2S_ROLE_MASTER);
+    tx_chan_cfg.auto_clear = true;
+    ESP_ERROR_CHECK(i2s_new_channel(&tx_chan_cfg, &tx_chan, NULL));
+
+    i2s_pdm_tx_config_t pdm_tx_cfg = {
+        .clk_cfg = I2S_PDM_TX_CLK_DEFAULT_CONFIG(config->sample_rate),
+        .slot_cfg = I2S_PDM_TX_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_STEREO),
+        .gpio_cfg = {
+            .clk = config->clk_io,
+            .dout = config->do_io,
+            .invert_flags = {
+                .clk_inv = false,
+            },
+        },
+    };
+    ESP_ERROR_CHECK(i2s_channel_init_pdm_tx_mode(tx_chan, &pdm_tx_cfg));
+    return tx_chan;
+}
+
+void i2sbuf_install(const i2sbuf_config_t *config)
+{
+    ESP_LOGD(TAG, "Initializing");
+
+    i2s_chan_handle_t tx_chan;
+    if (config->pdm_mode)
+    {
+        tx_chan = configure_pdm(config);
+    } else
+    {
+        tx_chan = configure_std(config);
+    }
 
     ESP_LOGD(TAG, "I2S configured");
 

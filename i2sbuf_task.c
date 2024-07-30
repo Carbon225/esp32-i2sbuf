@@ -6,6 +6,7 @@
 #include "freertos/FreeRTOS.h"
 #include "esp_log.h"
 #include "esp_err.h"
+#include "driver/i2s_common.h"
 
 static const char *TAG = "i2sbuf_task";
 

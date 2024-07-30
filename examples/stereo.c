@@ -7,7 +7,6 @@
 #include "esp_log.h"
 static const char *TAG = "main";
 
-#define I2S_NUM (I2S_NUM_0)
 #define I2S_WS (GPIO_NUM_16)
 #define I2S_DO (GPIO_NUM_17)
 #define I2S_CK (GPIO_NUM_5)
@@ -15,7 +14,6 @@ static const char *TAG = "main";
 #define SAMPLE_RATE (48000)
 
 #define BUF_LEN (256)
-#define BUF_COUNT (4)
 
 typedef struct wave_state
 {
@@ -49,19 +47,17 @@ void app_main(void)
     wave_state->freq = 220.f;
 
     i2sbuf_config_t config = {
-            .i2s_port = I2S_NUM,
-            .ws_io = I2S_WS,
-            .do_io = I2S_DO,
-            .clk_io = I2S_CK,
-            .sample_rate = SAMPLE_RATE,
-            .use_apll = false,
-            .buf_len = BUF_LEN,
-            .buf_count = BUF_COUNT,
-            .callback = audio_callback,
-            .user_data = wave_state,
+        .ws_io = I2S_WS,
+        .do_io = I2S_DO,
+        .clk_io = I2S_CK,
+        .sample_rate = SAMPLE_RATE,
+        .buf_len = BUF_LEN,
+        .callback = audio_callback,
+        .user_data = wave_state,
+        .pdm_mode = true,
     };
 
-    ESP_ERROR_CHECK(i2sbuf_install(&config));
+    i2sbuf_install(&config);
 
     ESP_LOGI(TAG, "Playing");
 }
